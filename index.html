@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Manuscript — Novel Writer</title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=Work+Sans:wght@400;500;600&display=swap">
+    <style>
+        :root {
+            --bg: #f4f6f5;
+            --panel: #e9eeed;
+            --ink: #1d2433;
+            --mute: #667085;
+            --line: #cfd8d6;
+            --acc: #1f6f78;
+            --accfg: #fff;
+            --page: #fdfefd;
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px)
+        }
+
+        @media (prefers-color-scheme:dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #12171d;
+                --panel: #1a2129;
+                --ink: #dde3ea;
+                --mute: #8d99a8;
+                --line: #2b3540;
+                --acc: #6cc4cc;
+                --accfg: #0e1418;
+                --page: #161c23
+            }
+        }
+
+        :root[data-theme="dark"] {
+            --bg: #12171d;
+            --panel: #1a2129;
+            --ink: #dde3ea;
+            --mute: #8d99a8;
+            --line: #2b3540;
+            --acc: #6cc4cc;
+            --accfg: #0e1418;
+            --page: #161c23
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0
+        }
+
+        html {
+            scroll-padding-top: env(safe-area-inset-top, 0px)
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--ink);
+            font: 15px/1.4 "Work Sans", system-ui, sans-serif;
+            overflow: hidden
+        }
+
+        button {
+            font: inherit;
+            color: inherit;
+            background: none;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer
+        }
+
+        button:hover {
+            background: var(--panel)
+        }
+
+        button:focus-visible,
+        textarea:focus-visible,
+        input:focus-visible {
+            outline: 2px solid var(--acc);
+            outline-offset: 1px
+        }
+
+        button.pri {
+            background: var(--acc);
+            color: var(--accfg);
+            border-color: var(--acc)
+        }
+
+        #app {
+            display: grid;
+            grid-template-columns: 260px 1fr 300px;
+            grid-template-rows: auto 1fr;
+            height: 100%
+        }
+
+        header {
+            grid-column: 1/-1;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--line);
+            background: var(--panel);
+            flex-wrap: wrap
+        }
+
+        #book {
+            font: 600 17px "Spectral", Georgia, serif;
+            background: none;
+            border: 0;
+            color: var(--ink);
+            min-width: 120px;
+            flex: 1;
+            max-width: 340px
+        }
+
+        .stats {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            color: var(--mute);
+            font-size: 13px;
+            margin-left: auto
+        }
+
+        .goal {
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .bar {
+            width: 90px;
+            height: 6px;
+            background: var(--line);
+            border-radius: 3px;
+            overflow: hidden
+        }
+
+        .bar i {
+            display: block;
+            height: 100%;
+            background: var(--acc);
+            width: 0
+        }
+
+        #goalIn {
+            width: 60px;
+            background: var(--bg);
+            color: var(--ink);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 3px 6px
+        }
+
+        aside {
+            overflow: auto;
+            padding: 12px;
+            background: var(--panel);
+            border-right: 1px solid var(--line)
+        }
+
+        aside.right {
+            border-right: 0;
+            border-left: 1px solid var(--line);
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .ch {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid transparent
+        }
+
+        .ch:hover {
+            background: var(--bg)
+        }
+
+        .ch.on {
+            background: var(--bg);
+            border-color: var(--acc)
+        }
+
+        .ch span.t {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap
+        }
+
+        .ch small {
+            color: var(--mute)
+        }
+
+        .ch .mv {
+            display: none;
+            gap: 2px
+        }
+
+        .ch.on .mv {
+            display: flex
+        }
+
+        .ch .mv button {
+            padding: 0 6px;
+            line-height: 20px
+        }
+
+        main {
+            overflow: auto;
+            padding: 28px 20px;
+            display: flex;
+            justify-content: center
+        }
+
+        .page {
+            width: 100%;
+            max-width: 680px
+        }
+
+        #title {
+            width: 100%;
+            font: 600 30px/1.2 "Spectral", Georgia, serif;
+            background: none;
+            border: 0;
+            color: var(--ink);
+            margin-bottom: 14px
+        }
+
+        #text {
+            width: 100%;
+            min-height: 70vh;
+            resize: none;
+            border: 0;
+            background: var(--page);
+            color: var(--ink);
+            font: 19px/1.75 "Spectral", Georgia, serif;
+            padding: 20px 22px;
+            border-radius: 8px;
+            box-shadow: 0 0 0 1px var(--line)
+        }
+
+        aside.right h3 {
+            margin: 0;
+            font-size: 14px
+        }
+
+        aside.right textarea {
+            width: 100%;
+            flex: 1;
+            min-height: 120px;
+            resize: none;
+            background: var(--bg);
+            color: var(--ink);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 8px;
+            font: 14px/1.5 "Work Sans", sans-serif
+        }
+
+        .tabs {
+            display: flex;
+            gap: 6px
+        }
+
+        .tabs button.on {
+            background: var(--acc);
+            color: var(--accfg);
+            border-color: var(--acc)
+        }
+
+        .toast {
+            position: fixed;
+            bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--ink);
+            color: var(--bg);
+            padding: 8px 14px;
+            border-radius: 6px;
+            opacity: 0;
+            transition: opacity .2s;
+            pointer-events: none
+        }
+
+        .toast.show {
+            opacity: 1
+        }
+
+        #app[hidden], #auth[hidden] {
+            display: none
+        }
+
+        #auth {
+            min-height: 100%;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background: var(--bg)
+        }
+
+        .auth-wrap {
+            width: min(100%, 420px)
+        }
+
+        .auth-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 32px;
+            font: 600 18px "Spectral", Georgia, serif
+        }
+
+        .auth-mark {
+            display: grid;
+            place-items: center;
+            width: 34px;
+            aspect-ratio: 1;
+            border-radius: 6px;
+            background: var(--acc);
+            color: var(--accfg);
+            font: 600 14px "Work Sans", sans-serif
+        }
+
+        .auth-panel {
+            padding: 28px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--page)
+        }
+
+        .auth-panel h1 {
+            margin: 0 0 20px;
+            font: 600 27px/1.2 "Spectral", Georgia, serif
+        }
+
+        .auth-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+            padding: 4px;
+            margin-bottom: 22px;
+            background: var(--panel);
+            border-radius: 6px
+        }
+
+        .auth-tabs button {
+            border-color: transparent
+        }
+
+        .auth-tabs button.on {
+            background: var(--page);
+            border-color: var(--line)
+        }
+
+        .auth-field {
+            display: block;
+            margin: 0 0 16px;
+            font-size: 13px;
+            font-weight: 600
+        }
+
+        .auth-field input {
+            display: block;
+            width: 100%;
+            margin-top: 6px;
+            padding: 10px 11px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: var(--bg);
+            color: var(--ink);
+            font: 15px "Work Sans", sans-serif
+        }
+
+        #authSubmit {
+            width: 100%;
+            margin-top: 4px;
+            padding: 10px
+        }
+
+        #authMessage {
+            min-height: 20px;
+            margin: 12px 0 0;
+            color: #a13c32;
+            font-size: 13px
+        }
+
+        #accountName {
+            color: var(--mute);
+            font-size: 13px
+        }
+
+        @media (max-width: 480px) {
+            .auth-panel { padding: 22px }
+        }
+
+        body.focus aside,
+        body.focus header .hide {
+            display: none
+        }
+
+        body.focus #app {
+            grid-template-columns: 1fr
+        }
+
+        body.focus header {
+            border: 0;
+            background: none
+        }
+
+        .only-m {
+            display: none
+        }
+
+        @media (max-width:900px) {
+            #app {
+                grid-template-columns: 1fr
+            }
+
+            aside {
+                display: none
+            }
+
+            body.s-left aside.left,
+            body.s-right aside.right {
+                display: block;
+                position: fixed;
+                z-index: 5;
+                top: 0;
+                bottom: 0;
+                width: min(86vw, 320px);
+                padding-top: calc(12px + env(safe-area-inset-top, 0px))
+            }
+
+            body.s-left aside.left {
+                left: 0
+            }
+
+            body.s-right aside.right {
+                right: 0;
+                display: flex
+            }
+
+            .only-m {
+                display: inline-block
+            }
+
+            #text {
+                font-size: 17px;
+                padding: 14px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <section id="auth" aria-labelledby="authTitle">
+        <div class="auth-wrap">
+            <div class="auth-brand"><span class="auth-mark">NW</span><span>Novel Writer</span></div>
+            <div class="auth-panel">
+                <div class="auth-tabs" role="tablist" aria-label="Account access">
+                    <button id="loginTab" class="on" type="button" role="tab" aria-selected="true">Log in</button>
+                    <button id="registerTab" type="button" role="tab" aria-selected="false">Create account</button>
+                </div>
+                <h1 id="authTitle">Welcome back</h1>
+                <form id="authForm">
+                    <label class="auth-field">Username
+                        <input id="authUsername" name="username" autocomplete="username" minlength="3" maxlength="24" required>
+                    </label>
+                    <label class="auth-field">Password
+                        <input id="authPassword" name="password" type="password" autocomplete="current-password" minlength="8" required>
+                    </label>
+                    <button id="authSubmit" class="pri" type="submit">Log in</button>
+                    <p id="authMessage" role="status" aria-live="polite"></p>
+                </form>
+            </div>
+        </div>
+    </section>
+    <div id="app" hidden>
+        <header>
+            <button class="only-m" id="tl" aria-label="Chapters">Chapters</button>
+            <input id="book" aria-label="Book title" placeholder="Untitled novel">
+            <div class="stats">
+                <span id="wc">0 words</span>
+                <span class="goal hide">Today <b id="tw">0</b>/<input id="goalIn" type="number" min="0"
+                        aria-label="Daily word goal"><span class="bar"><i id="gb"></i></span></span>
+                <span id="saved" class="hide"></span>
+                <button id="fb" class="hide">Focus</button>
+                <button id="cp" class="hide">Copy manuscript</button>
+                <button id="th" class="hide">Theme</button>
+                <button class="only-m" id="tr">Notes</button>
+                <span id="accountName"></span>
+                <button id="logout">Log out</button>
+            </div>
+        </header>
+        <aside class="left">
+            <button class="pri" id="add" style="width:100%;margin-bottom:10px">Add chapter</button>
+            <div id="list"></div>
+        </aside>
+        <main>
+            <div class="page">
+                <input id="title" aria-label="Chapter title" placeholder="Chapter title">
+                <textarea id="text" aria-label="Chapter text" placeholder="Start writing your chapter here."></textarea>
+            </div>
+        </main>
+        <aside class="right">
+            <div class="tabs"><button id="t1" class="on">Chapter notes</button><button id="t2">Story bible</button>
+            </div>
+            <h3 id="nh">Notes for this chapter</h3>
+            <textarea id="notes" aria-label="Notes"
+                placeholder="Beats, clues to plant, things to fix in revision."></textarea>
+        </aside>
+    </div>
+    <div class="toast" id="toast"></div>
+    <script>
+        (function () {
+            var $ = function (i) { return document.getElementById(i) };
+            var S = null, tab = 1, base = 0;
+            function uid() { return Math.random().toString(36).slice(2, 9) }
+            function blank() { return { id: uid(), title: "Chapter 1", text: "", notes: "" } }
+            function today() { return new Date().toISOString().slice(0, 10) }
+            function emptyState() { var chapters = [blank()]; return { book: "", bible: "", goal: 500, cur: chapters[0].id, theme: "", day: today(), dayWords: 0, chapters: chapters } }
+            S = emptyState();
+            function words(t) { var m = t.trim().match(/\S+/g); return m ? m.length : 0 }
+            function total() { return S.chapters.reduce(function (a, c) { return a + words(c.text) }, 0) }
+            function cur() { return S.chapters.find(function (c) { return c.id === S.cur }) || S.chapters[0] }
+            var timer, currentUser = null, dirty = false, busy = false, again = false, authMode = "login";
+            async function api(path, method, payload) {
+                var options = { method: method || "GET", headers: {} };
+                if (payload !== undefined) { options.headers["Content-Type"] = "application/json"; options.body = JSON.stringify(payload) }
+                var response = await fetch(path, options), result = {};
+                try { result = await response.json() } catch (e) { }
+                if (!response.ok) throw new Error(result.error || "Request failed");
+                return result;
+            }
+            function save() {
+                if (!currentUser) return;
+                dirty = true;
+                $("saved").textContent = "Unsaved changes"; clearTimeout(timer);
+                timer = setTimeout(flush, 700);
+            }
+            async function flush() {
+                if (!currentUser || !dirty) return;
+                if (busy) { again = true; return }
+                busy = true; dirty = false;
+                try {
+                    await api("/api/data", "PUT", S);
+                    $("saved").textContent = "Saved to your account";
+                } catch (e) { dirty = true; $("saved").textContent = "Save failed: " + e.message }
+                busy = false;
+                if (again || dirty && timer === undefined) { again = false; flush() }
+            }
+            function useState(data) {
+                if (data && Array.isArray(data.chapters) && data.chapters.length) {
+                    S = {
+                        book: typeof data.book === "string" ? data.book : "",
+                        bible: typeof data.bible === "string" ? data.bible : "",
+                        goal: Number.isFinite(Number(data.goal)) ? Math.max(0, Number(data.goal)) : 500,
+                        cur: data.cur,
+                        theme: data.theme === "dark" || data.theme === "light" ? data.theme : "",
+                        day: data.day || today(),
+                        dayWords: Math.max(0, Number(data.dayWords) || 0),
+                        chapters: data.chapters.filter(function (c) { return c && typeof c.id === "string" }).map(function (c) {
+                            return { id: c.id, title: typeof c.title === "string" ? c.title : "", text: typeof c.text === "string" ? c.text : "", notes: typeof c.notes === "string" ? c.notes : "" };
+                        })
+                    };
+                } else S = emptyState();
+                if (!S.chapters.length) S = emptyState();
+                if (!S.chapters.some(function (c) { return c.id === S.cur })) S.cur = S.chapters[0].id;
+                if (S.day !== today()) { S.day = today(); S.dayWords = 0 }
+                $("book").value = S.book; $("goalIn").value = S.goal;
+                applyTheme(); load(); renderList(); stats();
+            }
+            function showApp(user, data) {
+                currentUser = user; useState(data); $("accountName").textContent = user.username;
+                $("saved").textContent = data ? "Loaded from your account" : "";
+                $("auth").hidden = true; $("app").hidden = false;
+                if (!data) save();
+            }
+            function setAuthMode(mode) {
+                authMode = mode;
+                $("loginTab").classList.toggle("on", mode === "login");
+                $("registerTab").classList.toggle("on", mode === "register");
+                $("loginTab").setAttribute("aria-selected", mode === "login");
+                $("registerTab").setAttribute("aria-selected", mode === "register");
+                $("authTitle").textContent = mode === "login" ? "Welcome back" : "Create your account";
+                $("authSubmit").textContent = mode === "login" ? "Log in" : "Create account";
+                $("authPassword").autocomplete = mode === "login" ? "current-password" : "new-password";
+                $("authMessage").textContent = "";
+            }
+            async function checkSession() {
+                try {
+                    var session = await api("/api/session"), result = await api("/api/data");
+                    showApp(session.user, result.data);
+                } catch (e) { $("auth").hidden = false; $("app").hidden = true }
+            }
+            function toast(m) { var t = $("toast"); t.textContent = m; t.classList.add("show"); setTimeout(function () { t.classList.remove("show") }, 1800) }
+            function stats() {
+                $("wc").textContent = total().toLocaleString() + " words";
+                $("tw").textContent = Math.max(0, S.dayWords);
+                $("gb").style.width = (S.goal > 0 ? Math.min(100, Math.max(0, S.dayWords) / S.goal * 100) : 0) + "%";
+            }
+            function renderList() {
+                var l = $("list"); l.innerHTML = "";
+                S.chapters.forEach(function (c, i) {
+                    var d = document.createElement("div"); d.className = "ch" + (c.id === S.cur ? " on" : "");
+                    d.innerHTML = '<span class="t"></span><small>' + words(c.text) + '</small><span class="mv"><button aria-label="Move up">↑</button><button aria-label="Move down">↓</button><button aria-label="Delete chapter">✕</button></span>';
+                    d.querySelector(".t").textContent = c.title || "Untitled";
+                    d.onclick = function () { S.cur = c.id; load(); renderList(); document.body.classList.remove("s-left") };
+                    var b = d.querySelectorAll("button");
+                    b[0].onclick = function (e) { e.stopPropagation(); mv(i, -1) };
+                    b[1].onclick = function (e) { e.stopPropagation(); mv(i, 1) };
+                    b[2].onclick = function (e) { e.stopPropagation(); del(i) };
+                    l.appendChild(d);
+                });
+            }
+            function mv(i, d) { var j = i + d; if (j < 0 || j >= S.chapters.length) return; var a = S.chapters; var t = a[i]; a[i] = a[j]; a[j] = t; renderList(); save() }
+            function del(i) {
+                if (S.chapters.length === 1) { toast("A novel needs at least one chapter"); return }
+                if (!confirm("Delete “" + (S.chapters[i].title || "Untitled") + "”? This can’t be undone.")) return;
+                S.chapters.splice(i, 1); S.cur = S.chapters[Math.max(0, i - 1)].id; load(); renderList(); stats(); save();
+            }
+            function load() {
+                var c = cur(); $("title").value = c.title; $("text").value = c.text; base = words(c.text);
+                showNotes();
+            }
+            function showNotes() {
+                $("notes").value = tab === 1 ? cur().notes : S.bible;
+                $("nh").textContent = tab === 1 ? "Notes for this chapter" : "Characters, places, timeline, rules of your world";
+                $("t1").className = tab === 1 ? "on" : ""; $("t2").className = tab === 2 ? "on" : "";
+            }
+            $("text").oninput = function () {
+                var c = cur(), before = words(c.text); c.text = this.value;
+                S.dayWords += words(c.text) - before;
+                stats(); renderList(); save(c.id);
+            };
+            $("title").oninput = function () { cur().title = this.value; renderList(); save(cur().id) };
+            $("book").oninput = function () { S.book = this.value; save() };
+            $("notes").oninput = function () { if (tab === 1) { cur().notes = this.value; save(cur().id) } else { S.bible = this.value; save() } };
+            $("t1").onclick = function () { tab = 1; showNotes() };
+            $("t2").onclick = function () { tab = 2; showNotes() };
+            $("add").onclick = function () {
+                var c = blank(); c.title = "Chapter " + (S.chapters.length + 1); S.chapters.push(c); S.cur = c.id;
+                load(); renderList(); save(c.id); $("title").focus(); $("title").select(); document.body.classList.remove("s-left");
+            };
+            $("goalIn").onchange = function () { S.goal = Math.max(0, parseInt(this.value) || 0); stats(); save() };
+            $("fb").onclick = function () { document.body.classList.toggle("focus"); $("fb").textContent = "Focus"; }
+            document.addEventListener("keydown", function (e) { if (e.key === "Escape") document.body.classList.remove("focus", "s-left", "s-right") });
+            $("cp").onclick = function () {
+                var out = (S.book ? S.book + "\n\n" : "") + S.chapters.map(function (c) { return c.title + "\n\n" + c.text }).join("\n\n* * *\n\n");
+                var done = function () { toast("Manuscript copied to clipboard") };
+                try { navigator.clipboard.writeText(out).then(done, fallback) } catch (e) { fallback() }
+                function fallback() { var t = document.createElement("textarea"); t.value = out; document.body.appendChild(t); t.select(); try { document.execCommand("copy"); done() } catch (e) { toast("Copy blocked by the browser") } t.remove() }
+            };
+            $("th").onclick = function () {
+                var dark = S.theme ? S.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+                S.theme = dark ? "light" : "dark"; applyTheme(); save();
+            };
+            function applyTheme() { if (S.theme) document.documentElement.setAttribute("data-theme", S.theme) }
+            $("tl").onclick = function () { document.body.classList.toggle("s-left"); document.body.classList.remove("s-right") };
+            $("tr").onclick = function () { document.body.classList.toggle("s-right"); document.body.classList.remove("s-left") };
+            $("loginTab").onclick = function () { setAuthMode("login") };
+            $("registerTab").onclick = function () { setAuthMode("register") };
+            $("authForm").onsubmit = async function (e) {
+                e.preventDefault(); $("authSubmit").disabled = true; $("authMessage").textContent = "";
+                try {
+                    var endpoint = authMode === "login" ? "/api/login" : "/api/register";
+                    var result = await api(endpoint, "POST", { username: $("authUsername").value.trim(), password: $("authPassword").value });
+                    $("authPassword").value = "";
+                    var saved = await api("/api/data"); showApp(result.user, saved.data);
+                } catch (e) { $("authMessage").textContent = e.message }
+                finally { $("authSubmit").disabled = false }
+            };
+            $("logout").onclick = async function () {
+                clearTimeout(timer); await flush();
+                try { await api("/api/logout", "POST", {}) } catch (e) { }
+                currentUser = null; S = emptyState(); $("app").hidden = true; $("auth").hidden = false;
+                $("authUsername").value = ""; $("authPassword").value = ""; setAuthMode("login");
+            };
+            $("saved").textContent = "";
+            checkSession();
+        })();
+    </script>
+</body>
+
+</html>

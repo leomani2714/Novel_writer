@@ -1,0 +1,4 @@
+__pycache__/
+novel_writer.sqlite3
+novel_writer.sqlite3-shm
+novel_writer.sqlite3-wal
