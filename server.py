@@ -252,7 +252,7 @@ except ImportError:  # pragma: no cover
 
 if __name__ == "__main__":
     initialize_db()
-    host = os.environ.get("HOST", "127.0.0.1")
+   host = os.environ.get("HOST", "0.0.0.0")
     port = int(os.environ.get("PORT", "8000"))
     print("Novel Writer running at http://{}:{}/".format(host, port), flush=True)
     ThreadingHTTPServer((host, port), Handler).serve_forever()
